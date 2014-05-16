@@ -6,13 +6,6 @@ volatile uint32_t gDelayTimer;
 void Delay(volatile uint32_t TimeMs);
 static void InitPeripherals();
 
-uint8_t Buffer[4];
-volatile int8_t XOffset;
-volatile int8_t YOffset;
-/* Click detection */
-volatile uint8_t SingleClickDetect = 0x00;
-extern uint8_t ClickReg;    /* Defined in stm32f4xx_it.c */
-
 volatile LIS3DSH_OutXYZTypeDef axes, off;
 
 int main(void) {
