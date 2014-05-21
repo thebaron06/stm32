@@ -23,7 +23,7 @@ int main(void) {
     STM_EVAL_LEDOn(LED4);
 
 
-    UART2_SendBytes((uint8_t*)"alive", 5);
+    //UART2_SendBytes((uint8_t*)"alive", 5);
     while (1) {
         if (STM_EVAL_PBGetState(BUTTON_USER)) {
             Delay(5);   // wait 50 ms
@@ -40,14 +40,22 @@ int main(void) {
     // changes only
     lis3dsh_ReadAxes((LIS3DSH_OutXYZTypeDef*)&off);
 
+    volatile uint8_t frame[8] = {0};
+    frame[0] = 0x02;    // STX
+    frame[7] = 0x03;    // ETX
     while (1) {
         lis3dsh_ReadAxes((LIS3DSH_OutXYZTypeDef*)&axes);
-        int x = axes.x - off.x;
-        int y = axes.y - off.y;
-        int z = axes.z - off.z;
-        debug_printformatted("X = %8d\tY = %8d\tZ = %8d\n", x, y, z);
 
-        Delay(8);  // wait for 8 * 10 = 80ms
+        //int x = axes.x - off.x;
+        //int y = axes.y - off.y;
+        //int z = axes.z - off.z;
+        //debug_printformatted("X = %8d\tY = %8d\tZ = %8d\n", x, y, z);
+        *((int16_t *)&frame[1]) = (int16_t)(axes.x - off.x);
+        *((int16_t *)&frame[3]) = (int16_t)(axes.y - off.y);
+        *((int16_t *)&frame[5]) = (int16_t)(axes.z - off.z);
+        UART2_SendBytes((uint8_t*)frame, 8);
+
+        Delay(1);  // wait for 8 * 10 = 80ms
         off = axes;     // update offsets
     }
 }
